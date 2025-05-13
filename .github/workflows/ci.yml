@@ -1,4 +1,4 @@
-name: CI Python Docker URL Param
+name: CI & Docker Push
 
 on:
   push:
@@ -7,15 +7,21 @@ on:
     branches: [ "main" ]
 
 jobs:
-  build_and_test:
+  build-test-push:
     runs-on: ubuntu-latest
 
     steps:
     - name: Checkout code
       uses: actions/checkout@v4
 
+    - name: Log in to Docker Hub
+      run: echo "${{ secrets.DOCKER_PASSWORD }}" | docker login -u "${{ secrets.DOCKER_USERNAME }}" --password-stdin
+
     - name: Build Docker image
-      run: docker build -t myapp-ci:${{ github.sha }} .
+      run: docker build -t clementk57/python-docker-ci-urlparam:${{ github.sha }} .
 
     - name: Run tests inside Docker image
-      run: docker run --rm myapp-ci:${{ github.sha }} pytest
+      run: docker run --rm clementk57/python-docker-ci-urlparam:${{ github.sha }} pytest
+
+    - name: Push Docker image
+      run: docker push clementk57/python-docker-ci-urlparam:${{ github.sha }}

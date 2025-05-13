@@ -1,0 +1,21 @@
+name: CI Python Docker URL Param
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+
+jobs:
+  build_and_test:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Build Docker image
+      run: docker build -t myapp-ci:${{ github.sha }} .
+
+    - name: Run tests inside Docker image
+      run: docker run --rm myapp-ci:${{ github.sha }} pytest
